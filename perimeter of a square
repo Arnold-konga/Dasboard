@@ -1,0 +1,15 @@
+// perimeter of a square
+#include <stdio.h>
+
+int main() {
+    //input the data
+int length=10;
+int width=10;
+int perimeter;
+//calculation
+perimeter=(2*width)+(2*length);
+printf("length:%d\n",length);
+printf("width:%d\n",width);
+printf("the perimeter=:%d\n",perimeter);
+    return 0;
+}
