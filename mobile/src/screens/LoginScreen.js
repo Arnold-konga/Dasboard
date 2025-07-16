@@ -1,31 +1,45 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet } from 'react-native';
-import axios from 'axios';
+import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import auth from '@react-native-firebase/auth';
 
 const LoginScreen = ({ navigation }) => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   const handleLogin = async () => {
-    try {
-      const res = await axios.post('http://localhost:5000/users/login', {
-        username,
-        password,
-      });
-      console.log(res.data);
-      // Navigate to the home screen or another part of the app
-    } catch (err) {
-      console.error(err.response.data);
+    if (!email || !password) {
+      setError('Email and password are required.');
+      return;
     }
+    try {
+      await auth().signInWithEmailAndPassword(email, password);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleGoogleLogin = () => {
+    // To be implemented
+    console.log('Google login pressed');
+  };
+
+  const handleFacebookLogin = () => {
+    // To be implemented
+    console.log('Facebook login pressed');
   };
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Welcome Back</Text>
+      {error ? <Text style={styles.error}>{error}</Text> : null}
       <TextInput
         style={styles.input}
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
       />
       <TextInput
         style={styles.input}
@@ -35,7 +49,17 @@ const LoginScreen = ({ navigation }) => {
         secureTextEntry
       />
       <Button title="Login" onPress={handleLogin} />
-      <Button title="Go to Register" onPress={() => navigation.navigate('Register')} />
+      <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+        <Text style={styles.link}>Don't have an account? Register</Text>
+      </TouchableOpacity>
+      <View style={styles.socialLoginContainer}>
+        <TouchableOpacity style={styles.socialButton} onPress={handleGoogleLogin}>
+          <Text>Login with Google</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.socialButton} onPress={handleFacebookLogin}>
+          <Text>Login with Facebook</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -45,13 +69,42 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 16,
+    backgroundColor: '#fff',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 24,
   },
   input: {
     height: 40,
-    borderColor: 'gray',
+    borderColor: '#ccc',
     borderWidth: 1,
+    borderRadius: 5,
     marginBottom: 12,
     padding: 8,
+  },
+  link: {
+    color: 'blue',
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  socialLoginContainer: {
+    marginTop: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  socialButton: {
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+  },
+  error: {
+    color: 'red',
+    textAlign: 'center',
+    marginBottom: 10,
   },
 });
 

@@ -1,33 +1,52 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Button } from 'react-native';
 import axios from 'axios';
+import { useAuth } from '../firebase/AuthContext';
 
-const WishlistScreen = ({ userId }) => {
+const WishlistScreen = () => {
+  const { user } = useAuth();
   const [wishlist, setWishlist] = useState(null);
 
   useEffect(() => {
-    // You would typically get the userId from your auth context or navigation params
-    const id = "some_user_id";
-    axios.get(`http://localhost:5000/wishlist/${id}`)
+    if (user) {
+      axios.get(`http://localhost:5000/wishlist/${user.uid}`)
+        .then(response => {
+          setWishlist(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+    }
+  }, [user]);
+
+  const removeFromWishlist = (productId) => {
+    axios.post('http://localhost:5000/wishlist/remove', { userId: user.uid, productId })
       .then(response => {
-        setWishlist(response.data);
+        axios.get(`http://localhost:5000/wishlist/${user.uid}`)
+          .then(response => {
+            setWishlist(response.data);
+          })
+          .catch((error) => {
+            console.log(error);
+          })
       })
       .catch((error) => {
         console.log(error);
-      })
-  }, [userId]);
+      });
+  };
 
   const renderItem = ({ item }) => (
     <View style={styles.itemContainer}>
       <Text>{item.name}</Text>
       <Text>${item.price}</Text>
+      <Button title="Remove" onPress={() => removeFromWishlist(item._id)} />
     </View>
   );
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Wishlist</Text>
-      {wishlist ? (
+      {wishlist && wishlist.products.length > 0 ? (
         <FlatList
           data={wishlist.products}
           renderItem={renderItem}

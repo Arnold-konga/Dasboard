@@ -8,14 +8,21 @@ router.route('/:userId').get((req, res) => {
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
+router.route('/details/:orderId').get((req, res) => {
+  Order.findById(req.params.orderId)
+    .populate('products.product')
+    .then(order => res.json(order))
+    .catch(err => res.status(400).json('Error: ' + err));
+});
+
 router.route('/add').post((req, res) => {
-  const { userId, cart, total, mpesaReceiptNumber } = req.body;
+  const { userId, cart, total, paymentIntentId } = req.body;
 
   const newOrder = new Order({
     user: userId,
     products: cart.products,
     total,
-    mpesaReceiptNumber
+    paymentIntentId
   });
 
   newOrder.save()

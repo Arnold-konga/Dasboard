@@ -40,4 +40,26 @@ router.route('/add').post((req, res) => {
     });
 });
 
+router.route('/remove').post((req, res) => {
+  const { userId, productId } = req.body;
+
+  Wishlist.findOne({ user: userId })
+    .then(wishlist => {
+      if (wishlist) {
+        let itemIndex = wishlist.products.findIndex(p => p == productId);
+
+        if (itemIndex > -1) {
+          wishlist.products.splice(itemIndex, 1);
+          wishlist.save()
+            .then(() => res.json('Item removed from wishlist!'))
+            .catch(err => res.status(400).json('Error: ' + err));
+        } else {
+          res.status(400).json('Item not in wishlist');
+        }
+      } else {
+        res.status(400).json('Wishlist not found');
+      }
+    });
+});
+
 module.exports = router;

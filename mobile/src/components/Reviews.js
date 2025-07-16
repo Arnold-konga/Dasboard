@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
 import axios from 'axios';
+import { Rating } from 'react-native-ratings';
 
 const Reviews = ({ productId, userId }) => {
   const [reviews, setReviews] = useState([]);
@@ -32,7 +33,12 @@ const Reviews = ({ productId, userId }) => {
 
   const renderItem = ({ item }) => (
     <View style={styles.reviewContainer}>
-      <Text>{item.user.username} - {item.rating}/5</Text>
+      <Text>{item.user.email} - {item.rating}/5</Text>
+      <Rating
+        imageSize={20}
+        readonly
+        startingValue={item.rating}
+      />
       <Text>{item.comment}</Text>
     </View>
   );
@@ -51,13 +57,10 @@ const Reviews = ({ productId, userId }) => {
         onChangeText={setComment}
         style={styles.input}
       />
-      {/* Simple rating input for demo purposes */}
-      <TextInput
-        placeholder="Rating (1-5)"
-        value={String(rating)}
-        onChangeText={text => setRating(Number(text))}
-        keyboardType="numeric"
-        style={styles.input}
+      <Rating
+        showRating
+        onFinishRating={(rating) => setRating(rating)}
+        style={{ paddingVertical: 10 }}
       />
       <Button title="Submit Review" onPress={submitReview} />
     </View>
