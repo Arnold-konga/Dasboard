@@ -1,28 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import axios from 'axios';
+import { useAuth } from '../firebase/AuthContext';
 
-const OrderHistoryScreen = ({ userId }) => {
+const OrderHistoryScreen = ({ navigation }) => {
+  const { user } = useAuth();
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    // You would typically get the userId from your auth context or navigation params
-    const id = "some_user_id";
-    axios.get(`http://localhost:5000/orders/${id}`)
-      .then(response => {
-        setOrders(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-  }, [userId]);
+    if (user) {
+      axios.get(`http://localhost:5000/orders/${user.uid}`)
+        .then(response => {
+          setOrders(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+    }
+  }, [user]);
 
   const renderItem = ({ item }) => (
-    <View style={styles.orderContainer}>
+    <TouchableOpacity style={styles.orderContainer} onPress={() => navigation.navigate('OrderDetails', { orderId: item._id })}>
       <Text>Order ID: {item._id}</Text>
       <Text>Status: {item.status}</Text>
       <Text>Total: ${item.total}</Text>
-    </View>
+    </TouchableOpacity>
   );
 
   return (

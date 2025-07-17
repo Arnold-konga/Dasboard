@@ -42,4 +42,26 @@ router.route('/add').post((req, res) => {
     });
 });
 
+router.route('/remove').post((req, res) => {
+  const { userId, productId } = req.body;
+
+  Cart.findOne({ user: userId })
+    .then(cart => {
+      if (cart) {
+        let itemIndex = cart.products.findIndex(p => p.product == productId);
+
+        if (itemIndex > -1) {
+          cart.products.splice(itemIndex, 1);
+          cart.save()
+            .then(() => res.json('Item removed from cart!'))
+            .catch(err => res.status(400).json('Error: ' + err));
+        } else {
+          res.status(400).json('Item not in cart');
+        }
+      } else {
+        res.status(400).json('Cart not found');
+      }
+    });
+});
+
 module.exports = router;

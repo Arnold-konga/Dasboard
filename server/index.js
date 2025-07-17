@@ -24,6 +24,7 @@ const mpesaRouter = require('./routes/mpesa');
 const ordersRouter = require('./routes/orders');
 const notificationsRouter = require('./routes/notifications');
 const reviewsRouter = require('./routes/reviews');
+const adminRouter = require('./routes/admin');
 
 app.use('/users', usersRouter);
 app.use('/products', productsRouter);
@@ -33,6 +34,7 @@ app.use('/mpesa', mpesaRouter);
 app.use('/orders', ordersRouter);
 app.use('/notifications', notificationsRouter);
 app.use('/reviews', reviewsRouter);
+app.use('/admin', adminRouter);
 
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);

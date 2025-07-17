@@ -4,18 +4,18 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 router.route('/register').post(async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
-  if (!username || !password) {
+  if (!email || !password) {
     return res.status(400).json({ msg: 'Please enter all fields' });
   }
 
-  User.findOne({ username: username })
+  User.findOne({ email: email })
     .then(user => {
       if (user) return res.status(400).json({ msg: 'User already exists' });
 
       const newUser = new User({
-        username,
+        email,
         password
       });
 
@@ -35,7 +35,8 @@ router.route('/register').post(async (req, res) => {
                     token,
                     user: {
                       id: user.id,
-                      username: user.username
+                      email: user.email,
+                      role: user.role
                     }
                   });
                 }
@@ -47,13 +48,13 @@ router.route('/register').post(async (req, res) => {
 });
 
 router.route('/login').post(async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
-  if (!username || !password) {
+  if (!email || !password) {
     return res.status(400).json({ msg: 'Please enter all fields' });
   }
 
-  User.findOne({ username: username })
+  User.findOne({ email: email })
     .then(user => {
       if (!user) return res.status(400).json({ msg: 'User does not exist' });
 
@@ -71,7 +72,8 @@ router.route('/login').post(async (req, res) => {
                 token,
                 user: {
                   id: user.id,
-                  username: user.username
+                  email: user.email,
+                  role: user.role
                 }
               });
             }
